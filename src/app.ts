@@ -77,13 +77,24 @@ app.post("/api/customers/:id/purchase", (req: Request, res: Response): void => {
     }
 
     const purchaseAmount: number = req.body.amount;
+    let purchaseMultiplier = 1.0;
+    if (purchaseAmount > 5000){
+        purchaseMultiplier = 2.0
+    } else if(purchaseAmount > 1000){
+        purchaseMultiplier = 1.5
+    }
     const storeLocation: string = req.body.storeLocation;
 
-    let multiplier = 1.0;
+    let memberMultiplier = 1.0;
     if (customer.status === "PLATINUM") {
-        multiplier = 2.0;
+        memberMultiplier = 2.0;
     } else if (customer.status === "GOLD") {
-        multiplier = 1.2;
+        memberMultiplier = 1.2;
+    }
+
+    let multiplier = purchaseMultiplier * memberMultiplier;
+    if(multiplier > 3 ){
+        multiplier = 3
     }
 
     customer.points += Math.floor((purchaseAmount / 10) * multiplier);
